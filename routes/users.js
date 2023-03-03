@@ -1,9 +1,40 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+const User = require("../models/User.model")
+
+// GET Profile
+router.get('/profile/:userId', (req, res, next)  => {
+   User.findById(req.params.userId)
+    .populate('bookCollection')
+    .populate('bookClubs')
+    .then((foundUser) => {
+       res.json(foundUser)
+    })
+    .catch((err) =>{
+       console.log(err)
+    })
+ });
+
+ router.post('/profile-edit/:userId', (req, res, next)  => {
+   User.findByIdAndUpdate(req.params.userId, 
+    {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      profile_image: req.body.profile_image,
+      // bookCollection: [],
+      // bookClubs: []
+    },
+    {new: true}
+   )
+   .then((updatedUser) =>{
+    res.json(updatedUser)
+   })
+   .catch((err) =>{
+    console.log(err)
+   })
+ });
+
+
 
 module.exports = router;

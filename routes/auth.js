@@ -7,7 +7,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const saltRounds = 10;
 
-const isAuthenticated = require('../middlware/isAuthenticated')
+const isAuthenticated = require('../middleware/isAuthenticated')
 
 
 router.post("/signup", (req, res, next) => {
@@ -24,8 +24,13 @@ router.post("/signup", (req, res, next) => {
         const hashedPass = bcrypt.hashSync(req.body.password, salt);
 
         User.create({
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          email: req.body.email,
           password: hashedPass,
-          email: req.body.email
+          profile_image: req.body.profile_image,
+          bookCollection: [],
+          bookClubs: []
         })
           .then((createdUser) => {
             const payload = { _id: createdUser._id, email: createdUser.email };
