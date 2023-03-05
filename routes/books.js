@@ -16,7 +16,7 @@ router.post('/add-book/:bookId', isAuthenticated, (req, res, next) => {
       title: req.body.volumeInfo.title,
       author: req.body.volumeInfo.authors, //don't forget authors is an array of author names
       pages: req.body.volumeInfo.pageCount,
-      bookImg: req.body.imageLinks.small ,
+      bookImg: req.body.volumeInfo.imageLinks ,
       description: req.body.volumeInfo.description,
       publishedDate: req.body.volumeInfo.publishedDate,
       bookId: bookId,

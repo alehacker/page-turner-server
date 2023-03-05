@@ -34,7 +34,7 @@ app.use(
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.use('/books', booksRouter);
-app.use('/bookClubs', bookClubsRouter);
+app.use('/bookclubs', bookClubsRouter);
 
 
 
