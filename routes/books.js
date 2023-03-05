@@ -47,13 +47,9 @@ router.post('/add-book/:bookId', isAuthenticated, (req, res, next) => {
       }
    })
 
+   //need to add book to a bookclub
+})
 
-  
-
-
- 
-}
-)
 
 
 module.exports = router;

@@ -7,6 +7,7 @@ const bookClubSchema = new Schema(
     clubImg: String,
     meetingLink: String,
     schedule: String,
+    creator: [{type: Schema.Types.ObjectId, ref: "User"}],
     currentBook: [{type: Schema.Types.ObjectId, ref: "Book"}],
     bookCollection: [{type: Schema.Types.ObjectId, ref: "Book"}],
     members: [{type: Schema.Types.ObjectId, ref: "User"}]

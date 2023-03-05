@@ -23,6 +23,9 @@ router.post("/signup", (req, res, next) => {
         const salt = bcrypt.genSaltSync(saltRounds);
         const hashedPass = bcrypt.hashSync(req.body.password, salt);
 
+        const defaultImage = '../public/images/icons8-test-account-48.png';
+        const profileImage = req.body.profile_image || defaultImage;
+
         User.create({
           firstName: req.body.firstName,
           lastName: req.body.lastName,
