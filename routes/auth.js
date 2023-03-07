@@ -9,6 +9,7 @@ const saltRounds = 10;
 
 const isAuthenticated = require('../middleware/isAuthenticated')
 
+const fileUploader = require('../config/cloudinary.config');
 
 router.post("/signup", (req, res, next) => {
   if (!req.body.email || !req.body.password) {
@@ -31,7 +32,7 @@ router.post("/signup", (req, res, next) => {
           lastName: req.body.lastName,
           email: req.body.email,
           password: hashedPass,
-          profile_image: req.body.profile_image,
+          profile_image: req.file.path,
           bookCollection: [],
           bookClubs: []
         })

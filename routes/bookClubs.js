@@ -7,11 +7,13 @@ const User = require('../models/User.model')
 const isOwner = require('../middleware/isOwner');
 const isAuthenticated = require('../middleware/isAuthenticated');
 
+const fileUploader = require('../config/cloudinary.config');
+
 /* Listing all the Book Clubs available */
 router.get('/', (req, res, next) => {
    BookClub.find()
      .populate('creator')
-     .populate('currentBool')
+     .populate('currentBook')
      .populate('bookCollection')
      .populate('members')
      .sort({createdAt: -1})
@@ -23,11 +25,33 @@ router.get('/', (req, res, next) => {
      })
 });
 
+/**** Book Club Details Route ******/
+router.get('bookclub-details', fileUploader.single('imageUrl'), (req, res, next) =>{
+   BookClub.findById(req.params._id)
+   .populate('creator')
+   .populate('currentBook')
+   .populate('bookCollection')
+   .populate('members')
+   .then((foundBookClub) =>{
+      let urlArray = foundBookClub.clubImg.split('.')
+      let extension = urlArray[urlArray.length-1]
+      if (extension === 'jpg' || extension === 'jpeg' || extension === 'png') {
+         res.json(foundBookClub)
+     } else {
+         res.json(foundBookClub)
+     }
+   })
+   .catch((err) => {
+      console.log(err)
+   })
+
+})
+
 /* Create a Book Club */
 router.post('/create-bookclub/:userId', (req, res, next) => {
 
-   const defaultImage = '../public/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
-   const clubImg = req.body.clubImg || defaultImage;
+   const defaultImage = '/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
+   const clubImg = req.file.path || defaultImage;
 
    let newBookClub = {
       name: req.body.name,
@@ -74,7 +98,7 @@ router.post('/create-bookclub/:userId', (req, res, next) => {
 /* Editing a  Book Club  */
 router.post('/edit-bookclub/:bookclubId/:userId', isOwner, (req, res, next) => {
 
-      const clubImg = req.body.clubImg ? req.body.clubImg : '../public/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
+      const clubImg = req.body.clubImg ? req.body.clubImg : '/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
       
       //I could do this for default values of the bookcollection and the current book
       // const currentBook = req.body.currentBook || '';
@@ -108,7 +132,7 @@ router.post('/edit-bookclub/:bookclubId/:userId', isOwner, (req, res, next) => {
       
     res.send('POST request received')
 })
-
+/**** Delete Book Club Route *******/
 router.get('/delete-bookclub/:bookclubId/:userId', isOwner, (req, res, next) => {
    User.findById(req.params.userId)
        .then((foundUser) => {
@@ -149,5 +173,7 @@ router.post('/add-book/:bookclubId/:userId', isOwner, (req, res, next) => {
       res.status(500).json({ message: 'Error adding book to book club' });
    });
 })
+
+
 
 module.exports = router;
