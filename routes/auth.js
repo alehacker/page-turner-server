@@ -77,7 +77,8 @@ router.post("/login", (req, res, next) => {
           algorithm: "HS256",
           expiresIn: "24hr",
         });
-        res.json({ token: token, id: foundUser._id, message: `Welcome ${foundUser.email}` });
+        delete foundUser.password //Trying to not pass the pwd to the front end -- double check
+        res.json({ token: token, foundUser, message: `Welcome ${foundUser.email}` });
       } else {
         return res.status(402).json({ message: "Email or Password is incorrect" });
       }
