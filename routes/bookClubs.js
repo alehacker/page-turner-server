@@ -26,7 +26,7 @@ router.get('/', (req, res, next) => {
 });
 
 /**** Book Club Details Route ******/
-router.get('/bookclub-details/:bookclubId', fileUploader.single('clubImg'), (req, res, next) =>{
+router.get('/bookclub-details/:bookclubId',  (req, res, next) =>{
    BookClub.findById(req.params.bookclubId)
    .populate('creator')
    .populate('currentBook')
@@ -100,7 +100,7 @@ router.post('/create-bookclub/:userId', isAuthenticated,  (req, res, next) => {
 })
 
 /* Editing a  Book Club  */
-router.post('/edit-bookclub/:bookclubId/:userId', isOwner, (req, res, next) => {
+router.post('/edit-bookclub/:bookclubId/:userId', isAuthenticated, (req, res, next) => {
 
       const clubImg = req.body.clubImg ? req.body.clubImg : '/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
       
@@ -131,10 +131,10 @@ router.post('/edit-bookclub/:bookclubId/:userId', isOwner, (req, res, next) => {
             res.json(updatedBookClub);
          })
          .catch((err) => {
-            console.log(err);
+            console.log("Line 134", err);
          });
-      
-    res.send('POST request received')
+   
+ 
 })
 /**** Delete Book Club Route *******/
 router.get('/delete-bookclub/:bookclubId/:userId', isOwner, (req, res, next) => {
@@ -149,7 +149,7 @@ router.get('/delete-bookclub/:bookclubId/:userId', isOwner, (req, res, next) => 
                        console.log(err)
                    })
            } else {
-               res.json({message: "You can't delete this post"})
+               res.json({message: "You can't delete this Book Club"})
            }
        })
        .catch((err) => {
