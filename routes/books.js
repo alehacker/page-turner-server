@@ -12,45 +12,71 @@ router.post('/add-book/:bookId', isAuthenticated, (req, res, next) => {
    console.log(req.user)
    const {bookId} = req.params
 
-   let newBook = {
-      title: req.body.volumeInfo.title,
-      author: req.body.volumeInfo.authors.join(', '), //don't forget authors is an array of author names
-      pages: req.body.volumeInfo.pageCount,
-      bookImg: req.body.volumeInfo.imageLinks.thumbnail ,
-      description: req.body.volumeInfo.description,
-      publishedDate: req.body.volumeInfo.publishedDate,
-      bookId: bookId,
-      readBy: []
-   }
-
-   console.log(newBook)
-
-  Book.create(newBook)
-   .then((createdBook) =>{
-      if (createdBook){
-         User.findByIdAndUpdate(req.user._id, 
-            {$addToSet: {bookCollection: createdBook._id }},
-            {new: true}
-         ) 
+   Book.findOne({_id: bookId})
+   .then((foundBook) =>{
+      if (foundBook){
+         console.log ('Here is the book from MongoDB --->', foundBook)
+         foundBook.readBy.push(req.user._id)
+         console.log ('Here is the new array of readers --->', foundBook.readBy)
+         foundBook.save()
+         .then(() => {
+            return User.findByIdAndUpdate(req.user._id, 
+               {$addToSet: {bookCollection: foundBook._id }},
+               {new: true}
+            ) 
+            .populate('bookCollection')
+            .populate('bookClubs')
+            .exec()
+         })
          .then((updatedUser) => {
-            return updatedUser.populate('bookCollection')
+            res.json(updatedUser)
          })
-        .then((populated) => {
-            return populated.populate('bookClubs')
+         .catch((err) => {
+            console.log(err)
+            res.status(500).send('Internal Server Error')
          })
-         .then((second) => {
-            res.json(second)
-        })
-        .catch((err) => {
-         console.log(err)
-        })
+      } else {
+
+         let newBook = {
+            title: req.body.volumeInfo.title,
+            author: req.body.volumeInfo.authors.join(', '), //don't forget authors is an array of author names
+            pages: req.body.volumeInfo.pageCount,
+            bookImg: req.body.volumeInfo.imageLinks.thumbnail ,
+            description: req.body.volumeInfo.description,
+            publishedDate: req.body.volumeInfo.publishedDate,
+            bookId: bookId,
+            readBy: [req.user._id]
+         }
+
+         console.log(newBook)
+
+         Book.create(newBook)
+          .then((createdBook) =>{
+             if (createdBook){
+                User.findByIdAndUpdate(req.user._id, 
+                   {$addToSet: {bookCollection: createdBook._id }},
+                   {new: true}
+                ) 
+                .populate('bookCollection')
+                .populate('bookClubs')
+                .exec()
+                .then((updatedUser) => {
+                   res.json(updatedUser)
+                })
+                .catch((err) => {
+                   console.log(err)
+                   res.status(500).send('Internal Server Error')
+                })
+             }
+          })
+          .catch((err) => {
+             console.log(err)
+             res.status(500).send('Internal Server Error')
+          })
       }
    })
-
-   //need to add book to a bookclub
 })
 
 
 
 module.exports = router;
-

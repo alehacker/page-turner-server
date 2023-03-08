@@ -26,20 +26,21 @@ router.get('/', (req, res, next) => {
 });
 
 /**** Book Club Details Route ******/
-router.get('bookclub-details', fileUploader.single('imageUrl'), (req, res, next) =>{
+router.get('bookclub-details', fileUploader.single('clubImg'), (req, res, next) =>{
    BookClub.findById(req.params._id)
    .populate('creator')
    .populate('currentBook')
    .populate('bookCollection')
    .populate('members')
    .then((foundBookClub) =>{
-      let urlArray = foundBookClub.clubImg.split('.')
-      let extension = urlArray[urlArray.length-1]
-      if (extension === 'jpg' || extension === 'jpeg' || extension === 'png') {
          res.json(foundBookClub)
-     } else {
-         res.json(foundBookClub)
-     }
+   //    let urlArray = foundBookClub.clubImg.split('.')
+   //    let extension = urlArray[urlArray.length-1]
+   //    if (extension === 'jpg' || extension === 'jpeg' || extension === 'png') {
+   //       res.json(foundBookClub)
+   //   } else {
+   //       res.json(foundBookClub)
+   //   }
    })
    .catch((err) => {
       console.log(err)
@@ -51,7 +52,7 @@ router.get('bookclub-details', fileUploader.single('imageUrl'), (req, res, next)
 router.post('/create-bookclub/:userId', (req, res, next) => {
 
    const defaultImage = '/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
-   const clubImg = req.file.path || defaultImage;
+   const clubImg = req.body.clubImg|| defaultImage;
 
    let newBookClub = {
       name: req.body.name,
@@ -59,7 +60,7 @@ router.post('/create-bookclub/:userId', (req, res, next) => {
       clubImg: clubImg,  //<--- use cloudinary for this.
       meetingLink: req.body.meetingLink,
       schedule: req.body.schedule,
-      creator:  req.body.userId,
+      creator:  [req.body.userId],
       currentBook:  [],
       bookCollection:  [],
       members:  [req.params.userId] //<---- since the creator is the first member

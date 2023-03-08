@@ -13,7 +13,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    profile_image: String,
+    profileImage: String,
     bookCollection: [{type: Schema.Types.ObjectId, ref: "Book"}],
     bookClubs: [{type: Schema.Types.ObjectId, ref: "BookClub"}]
   },

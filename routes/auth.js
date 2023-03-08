@@ -25,14 +25,14 @@ router.post("/signup", (req, res, next) => {
         const hashedPass = bcrypt.hashSync(req.body.password, salt);
 
         const defaultImage = '../public/images/icons8-test-account-48.png';
-        const profileImage = req.body.profile_image || defaultImage;
+        const profileImage = req.body.profileImage|| defaultImage;
 
         User.create({
           firstName: req.body.firstName,
           lastName: req.body.lastName,
           email: req.body.email,
           password: hashedPass,
-          profile_image: req.file.path,
+          profileImage: profileImage,
           bookCollection: [],
           bookClubs: []
         })
@@ -89,9 +89,25 @@ router.post("/login", (req, res, next) => {
     });
 });
 
+
+
 router.get("/verify", isAuthenticated, (req, res) => {
-  return res.status(200).json(req.user);
-});
+
+   User.findOne({_id: req.user._id})
+   .populate('bookCollection')
+   .populate('bookClubs')
+   .then((foundUser) => {
+ 
+     const payload = { ...foundUser };
+     delete payload._doc.password;
+ 
+     res.status(200).json(payload._doc);
+ 
+   })
+   .catch((err) => {
+     console.log(err)
+   })
+ });
 
 
 module.exports = router;
