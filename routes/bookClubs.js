@@ -26,8 +26,8 @@ router.get('/', (req, res, next) => {
 });
 
 /**** Book Club Details Route ******/
-router.get('bookclub-details', fileUploader.single('clubImg'), (req, res, next) =>{
-   BookClub.findById(req.params._id)
+router.get('/bookclub-details/:bookclubId', fileUploader.single('clubImg'), (req, res, next) =>{
+   BookClub.findById(req.params.bookclubId)
    .populate('creator')
    .populate('currentBook')
    .populate('bookCollection')
@@ -49,7 +49,7 @@ router.get('bookclub-details', fileUploader.single('clubImg'), (req, res, next) 
 })
 
 /* Create a Book Club */
-router.post('/create-bookclub/:userId', (req, res, next) => {
+router.post('/create-bookclub/:userId', isAuthenticated,  (req, res, next) => {
 
    const defaultImage = '/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
    const clubImg = req.body.clubImg|| defaultImage;
@@ -60,7 +60,7 @@ router.post('/create-bookclub/:userId', (req, res, next) => {
       clubImg: clubImg,  //<--- use cloudinary for this.
       meetingLink: req.body.meetingLink,
       schedule: req.body.schedule,
-      creator:  [req.body.userId],
+      creator:  req.params.userId,
       currentBook:  [],
       bookCollection:  [],
       members:  [req.params.userId] //<---- since the creator is the first member
@@ -68,6 +68,7 @@ router.post('/create-bookclub/:userId', (req, res, next) => {
 
    BookClub.create(newBookClub)
    .then((createdBookClub) => {
+      
        User.findByIdAndUpdate(
            {
                _id: req.params.userId
@@ -76,11 +77,13 @@ router.post('/create-bookclub/:userId', (req, res, next) => {
            $push: {bookClubs: createdBookClub._id}
            },
            {new: true})
-       return createdBookClub
+           
+           .then((udpdatedUser) => {
+              console.log('updated user--->', udpdatedUser)
+              res.json(createdBookClub)
+          })
+      //  return createdBookClub
    })
-   .then((createdBookClub) => {
-      res.json(createdBookClub)
-  })
    // .then((createdBookClub) => {
    //      return createdBookClub.populate('bookCollection')  // <=== Should this be populated, since the book collection is non existent
    //     })
@@ -153,6 +156,28 @@ router.get('/delete-bookclub/:bookclubId/:userId', isOwner, (req, res, next) => 
            console.log(err)
        })
 })
+
+// ****  Add Book Club to User ***///
+router.post ('add-bookclub/:bookclubId/:userId', (req, res, next) =>{
+   const bookclubId = req.params.bookclubId;
+   const userId = req.params.userId;
+
+   User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { bookClubs: bookclubId } }, 
+      { new: true } 
+   )
+   .populate('bookClubs')
+   .then((udpdatedUser)=>{
+      res.json(udpdatedUser)
+   })
+   .catch((err) => {
+      console.log(err);
+      res.status(500).json({ message: 'Error adding a book club' });
+   });
+})
+
+
 
 //I'm not sure where to add this route, books or bookclubs
 //maybe bookclubs
