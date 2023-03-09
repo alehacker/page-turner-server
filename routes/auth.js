@@ -11,6 +11,16 @@ const isAuthenticated = require('../middleware/isAuthenticated')
 
 const fileUploader = require('../config/cloudinary.config');
 
+/*** Image Upload Route *****/
+
+router.post('/new-profile-photo', fileUploader.single('profileImage'), async (req, res, next) => {
+   res.json({profileImage: req.file.path})
+     console.log("File", req.file)
+})
+
+
+/*** Sign Up Route *****/
+
 router.post("/signup", (req, res, next) => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).json({ message: "please fill out all fields" });
@@ -24,15 +34,15 @@ router.post("/signup", (req, res, next) => {
         const salt = bcrypt.genSaltSync(saltRounds);
         const hashedPass = bcrypt.hashSync(req.body.password, salt);
 
-        const defaultImage = '../public/images/icons8-test-account-48.png';
-        const profileImage = req.body.profileImage|| defaultImage;
+      //   const defaultImage = '../public/images/icons8-test-account-48.png';
+      //   const profileImage = req.body.profileImage|| defaultImage;
 
         User.create({
           firstName: req.body.firstName,
           lastName: req.body.lastName,
           email: req.body.email,
           password: hashedPass,
-          profileImage: profileImage,
+          profileImage: req.body.profileImage,
           bookCollection: [],
           bookClubs: []
         })

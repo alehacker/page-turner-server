@@ -137,23 +137,31 @@ router.post('/edit-bookclub/:bookclubId/:userId', isAuthenticated, (req, res, ne
  
 })
 /**** Delete Book Club Route *******/
-router.get('/delete-bookclub/:bookclubId/:userId', isOwner, (req, res, next) => {
+
+// let index = bookClubs.indexOf(response.data)
+//          let newBookClubs = bookClubs.splice(index, 1)
+router.get('/delete-bookclub/:bookclubId/:userId', isAuthenticated, isOwner, (req, res, next) => {
+   console.log("These are the headers", req.headers)
    User.findById(req.params.userId)
        .then((foundUser) => {
            if (foundUser.bookClubs.includes(req.params.bookclubId)) {
                BookClub.findByIdAndDelete(req.params.bookclubId)
                    .then((deletedBookClub) => {
-                       res.json(deletedBookClub)
+                        let index = foundUser.bookClubs.indexOf(deletedBookClub)
+                        console.log("==> Here is the INDEX", index)
+                        foundUser.bookClubs.splice(index,1) 
+                        console.log("==> Udpated USER", foundUser)                      
+                        res.json(deletedBookClub)
                    })
                    .catch((err) => {
-                       console.log(err)
+                       console.log("line 149", err)
                    })
            } else {
                res.json({message: "You can't delete this Book Club"})
            }
        })
        .catch((err) => {
-           console.log(err)
+           console.log("line 156", err)
        })
 })
 
@@ -162,6 +170,10 @@ router.post ('add-bookclub/:bookclubId/:userId', (req, res, next) =>{
    const bookclubId = req.params.bookclubId;
    const userId = req.params.userId;
 
+   console.log(" ---> UserId Joining Club", req.params.userId)
+   console.log(" ---> clubid of the Club", req.params.bookclubId)
+   
+
    User.findByIdAndUpdate(
       userId,
       { $addToSet: { bookClubs: bookclubId } }, 
@@ -169,6 +181,7 @@ router.post ('add-bookclub/:bookclubId/:userId', (req, res, next) =>{
    )
    .populate('bookClubs')
    .then((udpdatedUser)=>{
+      console.log('here is the user that joined', udpdatedUser)
       res.json(udpdatedUser)
    })
    .catch((err) => {

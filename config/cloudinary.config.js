@@ -24,14 +24,7 @@ const storage = new CloudinaryStorage({
   }
 });
 
-//The following lines of code takes a word document and turns it into a pdf
-// cloudinary.uploader.upload("path/to/word/document.docx", {
-//     resource_type: "raw",
-//     format: "pdf"
-//   }, function(result) {
-//     console.log(result);
-//   });
-  
+
 
  
 //                     storage: storage

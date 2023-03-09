@@ -2,15 +2,24 @@ const jwt = require("jsonwebtoken");
 const BookClub = require('../models/BookClub.model');
 
 const isOwner = (req, res, next) => {
-
+   console.log("isOwner headers", req.headers)
+   console.log("isOwner params", req.params)
   BookClub.findById(req.params.bookclubId)
   .then((bookClub) =>{
+      console.log("Book club", bookClub)
       if (!bookClub) {
          return res.status(404).json({ message: "Book club not found" });
       }
-      if (!req.session.user || req.user.userId !== bookClub.creator.toString()) {
+      if (req.user._id !== bookClub.creator.toString()) {
+         console.log("user", req.user)
+         console.log("creator", bookClub.creator.toString(), bookClub.creator.toHexString())
          return res.status(401).json({ message: "Unauthorized" });
-      }  
+      } 
+      if (req.user._id === bookClub.creator.toString()) {
+         console.log("user", req.user)
+         console.log("creator", bookClub.creator.toString(), bookClub.creator.toHexString())
+         next()
+      } 
    })
    .catch((err) =>{
       console.log('ERROR on isOwner', err)
