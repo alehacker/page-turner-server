@@ -166,7 +166,7 @@ router.get('/delete-bookclub/:bookclubId/:userId', isAuthenticated, isOwner, (re
 })
 
 // ****  Add Book Club to User ***///
-router.post ('add-bookclub/:bookclubId/:userId', (req, res, next) =>{
+router.post ('/add-bookclub/:bookclubId/:userId', (req, res, next) =>{
    const bookclubId = req.params.bookclubId;
    const userId = req.params.userId;
 

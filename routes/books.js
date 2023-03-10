@@ -77,6 +77,18 @@ router.post('/add-book/:bookId', isAuthenticated, (req, res, next) => {
    })
 })
 
+router.get('/book-details/:bookId',  (req, res, next) =>{
+   Book.findById(req.params.bookclubId)
+   .populate('readBy')
+   .then((foundBook) =>{
+         res.json(foundBook)
+   })
+   .catch((err) => {
+      console.log(err)
+   })
+
+})
+
 
 
 module.exports = router;
