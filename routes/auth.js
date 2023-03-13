@@ -13,10 +13,14 @@ const fileUploader = require('../config/cloudinary.config');
 
 /*** Image Upload Route *****/
 
-router.post('/new-profile-photo', fileUploader.single('profileImage'), async (req, res, next) => {
-   res.json({profileImage: req.file.path})
-     console.log("File", req.file)
-})
+router.post('/upload-photo', fileUploader.single('profileImage'), async (req, res, next) => {
+   console.log(req.file)
+    if (!req.file) {
+      return res.status(500).json({ message: "Upload fail." });
+    }
+  
+    return res.status(201).json({ url: req.file.path });
+  });
 
 
 /*** Sign Up Route *****/

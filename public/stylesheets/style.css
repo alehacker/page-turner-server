@@ -6,3 +6,12 @@ body {
 a {
   color: #00B7FF;
 }
+
+.message{
+      background: #7286D3;
+      box-sizing: border-box;
+      color: #fff;
+      margin: 20px auto;
+      padding: 20px;
+      width: 380px;
+}

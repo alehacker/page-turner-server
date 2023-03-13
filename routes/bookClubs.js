@@ -25,6 +25,16 @@ router.get('/', (req, res, next) => {
      })
 });
 
+/**** Upload BookClub Image ******/
+router.post("/upload-photo", fileUploader.single('clubImg'), (req, res) => {
+   console.log(req.file)
+   if (!req.file) {
+     return res.status(500).json({ msg: "Upload fail." });
+   }
+ 
+   return res.status(201).json({ url: req.file.path });
+ });
+
 /**** Book Club Details Route ******/
 router.get('/bookclub-details/:bookclubId',  (req, res, next) =>{
    BookClub.findById(req.params.bookclubId)
@@ -51,13 +61,13 @@ router.get('/bookclub-details/:bookclubId',  (req, res, next) =>{
 /* Create a Book Club */
 router.post('/create-bookclub/:userId', isAuthenticated,  (req, res, next) => {
 
-   const defaultImage = '/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
-   const clubImg = req.body.clubImg|| defaultImage;
+   // const defaultImage = '/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
+   // const clubImg = req.body.clubImg|| defaultImage;
 
    let newBookClub = {
       name: req.body.name,
       description: req.body.description,
-      clubImg: clubImg,  //<--- use cloudinary for this.
+      clubImg: req.body.clubImg,  //<--- use cloudinary for this.
       meetingLink: req.body.meetingLink,
       schedule: req.body.schedule,
       creator:  req.params.userId,
@@ -87,12 +97,12 @@ router.post('/create-bookclub/:userId', isAuthenticated,  (req, res, next) => {
    // .then((createdBookClub) => {
    //      return createdBookClub.populate('bookCollection')  // <=== Should this be populated, since the book collection is non existent
    //     })
-   // .then((populated) => {
-   //     return populated.populate('members') // Doble check all this populate actions since, the book club is just created.
-   // })
-   // .then((populatedBookClub) => {
-   //     res.json(populatedBookClub)
-   // })
+   .then((populated) => {
+       return populated.populate('members') // Doble check all this populate actions since, the book club is just created.
+   })
+   .then((populatedBookClub) => {
+       res.json(populatedBookClub)
+   })
    .catch((err) => {
        console.log(err)
    })
@@ -102,7 +112,7 @@ router.post('/create-bookclub/:userId', isAuthenticated,  (req, res, next) => {
 /* Editing a  Book Club  */
 router.post('/edit-bookclub/:bookclubId/:userId', isAuthenticated, (req, res, next) => {
 
-      const clubImg = req.body.clubImg ? req.body.clubImg : '/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
+      // const clubImg = req.body.clubImg ? req.body.clubImg : '/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
       
       //I could do this for default values of the bookcollection and the current book
       // const currentBook = req.body.currentBook || '';
@@ -111,7 +121,7 @@ router.post('/edit-bookclub/:bookclubId/:userId', isAuthenticated, (req, res, ne
       let update = {
          name: req.body.name,
          description: req.body.description,
-         clubImg: clubImg,
+         clubImg: rec.body.clubImg,
          meetingLink: req.body.meetingLink,
          schedule: req.body.schedule
       };
@@ -180,6 +190,7 @@ router.post ('/add-bookclub/:bookclubId/:userId', (req, res, next) =>{
       { new: true } 
    )
    .populate('bookClubs')
+   .populate('bookCollection')
    .then((udpdatedUser)=>{
       console.log('here is the user that joined', udpdatedUser)
       res.json(udpdatedUser)

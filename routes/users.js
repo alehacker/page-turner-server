@@ -21,12 +21,14 @@ router.get('/profile/:userId', (req, res, next)  => {
     {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
-      profile_image: req.body.profile_image,
+      // profile_image: req.body.profile_image,
       // bookCollection: [],
       // bookClubs: []
     },
     {new: true}
    )
+   .populate('bookCollection')
+   .populate('bookClubs')
    .then((updatedUser) =>{
     res.json(updatedUser)
    })
