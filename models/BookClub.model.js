@@ -4,7 +4,7 @@ const bookClubSchema = new Schema(
   {
     name: String,
     description: String,
-   //  clubImg: String,
+    clubImg: String,
     meetingLink: String,
     schedule: String,
     creator: {type: Schema.Types.ObjectId, ref: "User"},

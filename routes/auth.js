@@ -52,7 +52,7 @@ router.post("/signup", (req, res, next) => {
         })
           .then((createdUser) => {
             const payload = { _id: createdUser._id, email: createdUser.email };
-
+            console.log('created user is===>', createdUser)
             const token = jwt.sign(payload, process.env.SECRET, {
               algorithm: "HS256",
               expiresIn: "24hr",
@@ -69,6 +69,7 @@ router.post("/signup", (req, res, next) => {
     });
 });
 
+/*** Login Route *****/
 router.post("/login", (req, res, next) => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).json({ message: "please fill out both fields" });

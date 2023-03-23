@@ -21,7 +21,8 @@ router.get('/profile/:userId', (req, res, next)  => {
     {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
-      // profile_image: req.body.profile_image,
+      email: req.body.email,
+      profileImage: req.body.profileImage,
       // bookCollection: [],
       // bookClubs: []
     },

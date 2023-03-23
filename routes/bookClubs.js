@@ -29,7 +29,7 @@ router.get('/', (req, res, next) => {
 router.post("/upload-photo", fileUploader.single('clubImg'), (req, res) => {
    console.log(req.file)
    if (!req.file) {
-     return res.status(500).json({ msg: "Upload fail." });
+     return res.status(500).json({ message: "Upload fail." });
    }
  
    return res.status(201).json({ url: req.file.path });
@@ -112,16 +112,10 @@ router.post('/create-bookclub/:userId', isAuthenticated,  (req, res, next) => {
 /* Editing a  Book Club  */
 router.post('/edit-bookclub/:bookclubId/:userId', isAuthenticated, (req, res, next) => {
 
-      // const clubImg = req.body.clubImg ? req.body.clubImg : '/images/robert-anasch-McX3XuJRsUM-unsplash.jpg';
-      
-      //I could do this for default values of the bookcollection and the current book
-      // const currentBook = req.body.currentBook || '';
-      // const bookCollection = req.body.bookCollection || [];
-      
       let update = {
          name: req.body.name,
          description: req.body.description,
-         clubImg: rec.body.clubImg,
+         clubImg: req.body.clubImg,
          meetingLink: req.body.meetingLink,
          schedule: req.body.schedule
       };
@@ -132,18 +126,26 @@ router.post('/edit-bookclub/:bookclubId/:userId', isAuthenticated, (req, res, ne
       if (req.body.bookCollection) {
          update.bookCollection = req.body.bookCollection;
       }
+      
+      User.findById(req.params.userId)
+      .then((foundUser) => {
+         if (foundUser.bookClubs.includes(req.params.bookclubId)) {
+            BookClub.findByIdAndUpdate(req.params.bookclubId,
+               update,
+               { new: true }
+            )
+               .then((updatedBookClub) => {
+                  res.json(updatedBookClub);
+               })
+               .catch((err) => {
+                  console.log("Line 141", err);
+               });
+           
+        } else {
+            res.json({message: "You can't Edit this Book Club"})
+        }
 
-      BookClub.findByIdAndUpdate(req.params.bookclubId,
-         update,
-         { new: true }
-      )
-         .then((updatedBookClub) => {
-            res.json(updatedBookClub);
-         })
-         .catch((err) => {
-            console.log("Line 134", err);
-         });
-   
+      })
  
 })
 /**** Delete Book Club Route *******/
@@ -164,14 +166,14 @@ router.get('/delete-bookclub/:bookclubId/:userId', isAuthenticated, isOwner, (re
                         res.json(deletedBookClub)
                    })
                    .catch((err) => {
-                       console.log("line 149", err)
+                       console.log("line 169", err)
                    })
            } else {
                res.json({message: "You can't delete this Book Club"})
            }
        })
        .catch((err) => {
-           console.log("line 156", err)
+           console.log("line 176", err)
        })
 })
 
@@ -203,7 +205,7 @@ router.post ('/add-bookclub/:bookclubId/:userId', (req, res, next) =>{
 
 
 
-//I'm not sure where to add this route, books or bookclubs
+//I'm not sure how to implement this route, books or bookclubs
 //maybe bookclubs
 router.post('/add-book/:bookclubId/:userId', isOwner, (req, res, next) => {
    const { bookId } = req.body;
