@@ -57,7 +57,7 @@ router.post("/signup", (req, res, next) => {
               algorithm: "HS256",
               expiresIn: "24hr",
             });
-            res.json({ token: token, id: createdUser._id });
+            res.json({ token: token, id: createdUser._id, createdUser});
           })
           .catch((err) => {
             res.status(400).json(err.message);
